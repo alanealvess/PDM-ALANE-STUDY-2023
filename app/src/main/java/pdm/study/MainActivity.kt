@@ -24,6 +24,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import pdm.study.ui.theme.Pessego
 import pdm.study.ui.theme.StudyTheme
 

@@ -1,7 +1,9 @@
 package pdm.study
 
 import android.content.Intent
+import android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -26,13 +28,19 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import pdm.study.ui.theme.Branco
 import pdm.study.ui.theme.Pessego
 import pdm.study.ui.theme.StudyTheme
 
 class ContaEntrar : ComponentActivity() {
+    private lateinit var fbAuthList: FBAuthListener
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        this.fbAuthList = FBAuthListener(this)
+
         setContent {
             StudyTheme {
                 Surface(
@@ -45,15 +53,21 @@ class ContaEntrar : ComponentActivity() {
             }
         }
     }
+    override fun onStart() {
+        super.onStart()
+        Firebase.auth.addAuthStateListener(fbAuthList)
+    }
+    override fun onStop() {
+        super.onStop()
+        Firebase.auth.removeAuthStateListener(fbAuthList)
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ContaLogin(activity: ComponentActivity, parEmail: String) {
-    var email by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf(parEmail) }
     var password by remember { mutableStateOf("") }
-
-    email = parEmail
 
     // Verifique se todos os campos estão preenchidos e se as senhas coincidem
     val isButtonEnabled = email.isNotBlank() && password.isNotBlank()
@@ -72,7 +86,7 @@ fun ContaLogin(activity: ComponentActivity, parEmail: String) {
         )
         Spacer(modifier = Modifier.size(12.dp))
         Text(
-            text = "Bem-Vindo de volta!",
+            text = "Bem-Vindo!",
             style = TextStyle(
                 fontSize = 16.sp
             )
@@ -112,11 +126,14 @@ fun ContaLogin(activity: ComponentActivity, parEmail: String) {
         ) {
             Button(
                 onClick = {
-                    activity.startActivity(
-                        Intent(activity, ContaMenu::class.java).setFlags(
-                            Intent.FLAG_ACTIVITY_SINGLE_TOP
-                        )
-                    )
+                    Firebase.auth.signInWithEmailAndPassword(email, password)
+                        .addOnCompleteListener(activity!!) { task ->
+                            if (task.isSuccessful) {
+                                Toast.makeText(activity, "Login OK!", Toast.LENGTH_LONG).show()
+                            } else {
+                                Toast.makeText(activity, "Login FALHOU!", Toast.LENGTH_LONG).show()
+                            }
+                        }
                 },
                 enabled = isButtonEnabled,
                 modifier = Modifier

@@ -2,6 +2,7 @@ package pdm.study
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
@@ -26,6 +27,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import pdm.study.ui.theme.Pessego
 import pdm.study.ui.theme.StudyTheme
 
@@ -48,6 +51,8 @@ class ContaMenu : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ContaMenuOpcoes(activity: ComponentActivity) {
+    val viewModel = MainViewModel()
+
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Top,
@@ -62,7 +67,7 @@ fun ContaMenuOpcoes(activity: ComponentActivity) {
         )
         Spacer(modifier = Modifier.size(12.dp))
         Text(
-            text = "Escolha o que você deseja",
+            text = "Escolha o que você deseja ${viewModel.user.name}",
             style = TextStyle(
                 fontSize = 16.sp
             )
@@ -114,6 +119,24 @@ fun ContaMenuOpcoes(activity: ComponentActivity) {
                     )
                 )
             }
+            Button(
+                onClick = {
+                    Firebase.auth.signOut()
+                    activity.finish()
+                },
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth(0.7f),
+                colors = ButtonDefaults.buttonColors(Pessego)
+            ) {
+                Text("Sair (Logout)",
+                    style = TextStyle(
+                        color = Color.Black,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 17.sp
+                    )
+                )
+            }
         }
     }
 }
@@ -121,7 +144,7 @@ fun ContaMenuOpcoes(activity: ComponentActivity) {
 @Preview
 @Composable
 fun ContaMenuOpcoesPreview() {
-    val activity = ContaMenu() // Substitua por sua própria Activity
+    val activity = ContaMenu()
     StudyTheme {
         Surface(
             modifier = Modifier.fillMaxSize(),

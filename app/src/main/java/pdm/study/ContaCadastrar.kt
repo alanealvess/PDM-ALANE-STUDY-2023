@@ -2,6 +2,7 @@ package pdm.study
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -37,12 +38,19 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
+import pdm.study.db.FirebaseDB
 import pdm.study.ui.theme.Pessego
 import pdm.study.ui.theme.StudyTheme
 
 class ContaCadastrar : ComponentActivity() {
+    private lateinit var fbAuthList: FBAuthListener
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        this.fbAuthList = FBAuthListener(this)
+
         setContent {
             StudyTheme {
                 Surface(
@@ -53,6 +61,14 @@ class ContaCadastrar : ComponentActivity() {
                 }
             }
         }
+    }
+    override fun onStart() {
+        super.onStart()
+        Firebase.auth.addAuthStateListener(fbAuthList)
+    }
+    override fun onStop() {
+        super.onStop()
+        Firebase.auth.removeAuthStateListener(fbAuthList)
     }
 }
 
@@ -155,12 +171,16 @@ fun ContaCriar(activity: ComponentActivity) {
         Spacer(modifier = Modifier.size(24.dp))
         Button(
             onClick = {
-                val intent = Intent(activity, ContaCadastrada::class.java).apply {
-                    putExtra("nome", name)
-                    putExtra("email", email)
-                    flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
-                }
-                activity.startActivity(intent)
+                Firebase.auth.createUserWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(activity!!) { task ->
+                        if (task.isSuccessful) {
+                            FirebaseDB.register(name, email)
+                            Toast.makeText(activity, "Registro OK!", Toast.LENGTH_LONG).show()
+                            activity?.finish()
+                        } else {
+                            Toast.makeText(activity,"Registro FALHOU!", Toast.LENGTH_LONG).show()
+                        }
+                    }
             },
             enabled = isButtonEnabled,
             modifier = Modifier.padding(16.dp),

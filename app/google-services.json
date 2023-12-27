@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "892246694667",
+    "project_id": "studyalanealves",
+    "storage_bucket": "studyalanealves.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:892246694667:android:20492edfdf7d5e0882600e",
+        "android_client_info": {
+          "package_name": "pdm.study"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCjAiKnypIIjknmDUbNZtdkSi03Fwvv2j0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
